@@ -1,11 +1,11 @@
-﻿using GameNetcodeStuff;
+﻿using DunGen;
+using GameNetcodeStuff;
 using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UIElements;
+using UnityEngine.XR;
+using System.Windows.Input;
+using UnityEngine.InputSystem;
 
 namespace OinkyMod
 {
@@ -26,7 +26,7 @@ namespace OinkyMod
         [HarmonyPostfix]
         public static void IncreasedQuotaDays(TimeOfDay __instance)
         {
-            __instance.quotaVariables.deadlineDaysAmount = NewQuotaDays;
+            __instance.quotaVariables.deadlineDaysAmount = Mod.NewQuotaDays;
 
         } // end IncreasedQuotaDays
 
@@ -36,8 +36,41 @@ namespace OinkyMod
         {
             if(!__instance.isSprinting)
                 __instance.sprintMeter = Mathf.Clamp(__instance.sprintMeter + Time.deltaTime / Mod.BonusStaminaRegain, 0f, 1f);
-            
-        } // end StaminaPrefix
+
+        } // end FlatStaminaRegain
+
+        [HarmonyPatch(typeof(PlayerControllerB), "OnEnable")]
+        [HarmonyPrefix]
+        public static void PlayerRegisterKeys(PlayerControllerB __instance)
+        {
+            InputAction action = new InputAction();
+            action.AddBinding("<Keyboard>/r");
+            action.performed += Test;
+
+        } // end PlayerRegisterKeys
+
+        public static void Test(InputAction.CallbackContext context)
+        {
+            Logging.Write("test!!!!!");
+
+        } // end Test
+
+        [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
+        [HarmonyPostfix]
+        public static void PlayerNumKeySwitch(PlayerControllerB __instance)
+        {
+            /*
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+                Traverse.Create(__instance).Method("SwitchToItemSlot", 1, null).GetValue();
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
+                Traverse.Create(__instance).Method("SwitchToItemSlot", 2, null).GetValue();
+            else if(Input.GetKeyDown(KeyCode.Alpha5))
+                Traverse.Create(__instance).Method("SwitchToItemSlot", 3, null).GetValue();
+            else if(Input.GetKeyDown(KeyCode.Alpha6))
+                Traverse.Create(__instance).Method("SwitchToItemSlot", 4, null).GetValue();
+            */
+
+        } // end PlayerNumKeySwitch
 
         /*
         [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]

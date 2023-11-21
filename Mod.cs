@@ -106,7 +106,7 @@ namespace OinkyMod
                         clip = DownloadHandlerAudioClip.GetContent(uwr);
                     }
                 }
-                catch (Exception err)
+                catch (Exception _)
                 {
                 }
             }
