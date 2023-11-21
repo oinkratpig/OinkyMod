@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using HarmonyLib;
 using System.IO;
 
 namespace OinkyMod
@@ -6,12 +7,16 @@ namespace OinkyMod
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
+        private static Harmony _harmony = new Harmony(PluginInfo.PLUGIN_GUID);
+
         private void Awake()
         {
-            Directory.CreateDirectory(Mod.ModFolder);
+            Directory.CreateDirectory(ModConfig.ModFolder);
             Logging.Logger = Logger;
             Mod.LoadCustomMusic();
-            Mod.harmonyInst.PatchAll(typeof(Patches));
+            _harmony.PatchAll(typeof(Patches));
+            _harmony.PatchAll(typeof(Player));
+            _harmony.PatchAll(typeof(CustomKeys));
 
             Logging.Write($"{PluginInfo.PLUGIN_GUID} is loaded.");
 

@@ -13,83 +13,18 @@ namespace OinkyMod
     public static class Mod
     {
         /// <summary>
-        /// Cooldown modes for switching items using number keys.<br/>
-        /// </summary>
-        public enum SwitchCooldownMode {
-
-            /// <summary>
-            /// No cooldown.
-            /// </summary>
-            NoCooldown,
-            /// <summary>
-            /// Cooldown only when switching.
-            /// </summary>
-            SingleCooldown,
-            /// <summary>
-            /// Longer cooldown for distance scrolled.
-            /// </summary>
-            ScrollCooldown
-        }
-
-        /// <summary>
-        /// OinkyMod's folder for holding logs, config, audio, etc.
-        /// </summary>
-        public static string ModFolder { get; private set; }
-
-        /// <summary>
-        /// Name of the mod folder. Is NOT the entire path.
-        /// </summary>
-        private const string MOD_FOLDER_NAME = PluginInfo.PLUGIN_NAME;
-
-        /// <summary>
-        /// Harmony instance
-        /// </summary>
-        public static Harmony harmonyInst = new Harmony(PluginInfo.PLUGIN_GUID);
-
-        /// <summary>
-        /// List of all custom boombox <see cref="AudioClip"/>s.
-        /// </summary>
-        public static List<AudioClip> CustomBoomboxMusic { get; private set; }
-
-        /// <summary>
-        /// Flat amount of stamina regain to always recover when not sprinting.<br/>
-        /// 12f = not much faster (barely noticeable)<br/>
-        /// 9f = a bit faster (not too strong)<br/>
-        /// 6f = a lot faster (cheating)
-        /// </summary>
-        public static float BonusStaminaRegain { get; private set; }
-
-        /// <summary>
-        /// New amount of days to meet quota.
-        /// </summary>
-        public static int NewQuotaDays { get; private set; }
-
-        // Fields
-        public static SwitchCooldownMode switchCooldownMode;
-
-        // Constructor
-        static Mod()
-        {
-            NewQuotaDays = 4;
-            BonusStaminaRegain = 9f;
-            switchCooldownMode = SwitchCooldownMode.SingleCooldown;
-            ModFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), MOD_FOLDER_NAME);
-
-        } // end constructor
-
-        /// <summary>
         /// Load all custom music.
         /// </summary>
         public static async void LoadCustomMusic()
         {
             Logging.Write("Loading custom boombox music...");
-            CustomBoomboxMusic = new List<AudioClip>();
+            ModConfig.CustomBoomboxMusic = new List<AudioClip>();
             string path;
             int i = 1;
             while (true)
             {
                 string filename = $"boombox{i}.ogg";
-                path = Path.Combine(ModFolder, filename);
+                path = Path.Combine(ModConfig.ModFolder, filename);
 
                 Logging.Write($"Looking for {filename}.");
                 if (!File.Exists(path))
@@ -102,7 +37,7 @@ namespace OinkyMod
                     Logging.Write($"Found {filename}");
                     AudioClip clip = await GetCustomAudioClip(path);
                     if(clip != null)
-                        CustomBoomboxMusic.Add(clip);
+                        ModConfig.CustomBoomboxMusic.Add(clip);
                 }
                 i++;
             }

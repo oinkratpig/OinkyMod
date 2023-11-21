@@ -3,7 +3,7 @@ using System.IO;
 
 namespace OinkyMod
 {
-    public static class Logging
+    internal static class Logging
     {
         public static ManualLogSource Logger { get; set; }
 
@@ -13,7 +13,7 @@ namespace OinkyMod
         // Constructor
         static Logging()
         {
-            _logPath = Path.Combine(Mod.ModFolder, LOG_FILE_NAME);
+            _logPath = Path.Combine(ModConfig.ModFolder, LOG_FILE_NAME);
             CreateNewLog();
 
         } // end constructor
