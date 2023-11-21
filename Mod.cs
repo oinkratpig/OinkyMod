@@ -7,11 +7,31 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using UnityEngine;
 using System.Collections.Generic;
+using static OinkyMod.Mod;
 
 namespace OinkyMod
 {
     public static class Mod
     {
+        /// <summary>
+        /// Cooldown modes for switching items using number keys.<br/>
+        /// </summary>
+        public enum SwitchCooldownMode {
+
+            /// <summary>
+            /// No cooldown.
+            /// </summary>
+            NoCooldown,
+            /// <summary>
+            /// Cooldown only when switching.
+            /// </summary>
+            SingleCooldown,
+            /// <summary>
+            /// Longer cooldown for distance scrolled.
+            /// </summary>
+            ScrollCooldown
+        }
+
         /// <summary>
         /// OinkyMod's folder for holding logs, config, audio, etc.
         /// </summary>
@@ -45,11 +65,15 @@ namespace OinkyMod
         /// </summary>
         public static int NewQuotaDays { get; private set; }
 
+        // Fields
+        public static SwitchCooldownMode switchCooldownMode;
+
         // Constructor
         static Mod()
         {
             NewQuotaDays = 4;
             BonusStaminaRegain = 9f;
+            switchCooldownMode = SwitchCooldownMode.SingleCooldown;
             ModFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), MOD_FOLDER_NAME);
 
         } // end constructor
@@ -95,8 +119,6 @@ namespace OinkyMod
             using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(path, AudioType.OGGVORBIS))
             {
                 uwr.SendWebRequest();
-
-                // wrap tasks in try/catch, otherwise it'll fail silently
                 try
                 {
                     while (!uwr.isDone) await Task.Delay(5);
@@ -111,7 +133,8 @@ namespace OinkyMod
                 }
             }
             return clip;
-        }
+
+        } // end GetCustomAudioClip
 
     } // end class Mod
 

@@ -122,14 +122,36 @@ namespace OinkyMod
         /// </summary>
         private static void SwitchToSlot(int slot)
         {
-            Logging.Write("terst");
+            Traverse timeSinceSwitchingSlots = Traverse.Create(_playerBeingControlled).Field("timeSinceSwitchingSlots");
 
-            int currentSlot = _playerBeingControlled.currentItemSlot;
-            int distanceLeft = currentSlot - slot;
-            int distanceRight = slot + _playerBeingControlled.ItemSlots.Length - currentSlot;
-            bool forward = distanceRight <= distanceLeft;
+            // Wait cooldown
+            float cooldownLength = 0.3f;
+            if (Mod.switchCooldownMode != Mod.SwitchCooldownMode.NoCooldown &&
+                timeSinceSwitchingSlots.GetValue<float>() < cooldownLength)
+            {
+                return;
+            }
+
+            // Determine inventory scrolling direction
+            var countWrap = (int from, int to, int min, int max, bool positiveIncrement) =>
+            {
+                int moves = 0;
+                while(from != to)
+                {
+                    int increment = (positiveIncrement) ? 1 : -1;
+                    moves += increment;
+                    from += increment;
+                    if (from > max) from = min;
+                    else if (from < min) from = max;
+                }
+                return moves;
+            };
+            int distanceRight = countWrap(_playerBeingControlled.currentItemSlot, slot, 0, _playerBeingControlled.ItemSlots.Length, true);
+            int distanceLeft = countWrap(_playerBeingControlled.currentItemSlot, slot, 0, _playerBeingControlled.ItemSlots.Length, false);
+            bool forward = Math.Abs(distanceRight) > Math.Abs(distanceLeft);
+            
+            // Scroll inventory appropriate number of times
             MethodInfo switchToItemSlot = _playerBeingControlled.GetType().GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
-            //MethodInfo nextItemSlot = _playerBeingControlled.GetType().GetMethod("NextItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo switchItemSlotsServerRpc = _playerBeingControlled.GetType().GetMethod("SwitchItemSlotsServerRpc", BindingFlags.NonPublic | BindingFlags.Instance);
             while (_playerBeingControlled.currentItemSlot != slot)
             {
@@ -142,6 +164,16 @@ namespace OinkyMod
                 _playerBeingControlled.currentlyHeldObjectServer.gameObject.GetComponent<AudioSource>().PlayOneShot(_playerBeingControlled.currentlyHeldObjectServer.itemProperties.grabSFX, 0.6f);
             }
             Traverse.Create(_playerBeingControlled).Field("timeSinceSwitchingSlots").SetValue(0f);
+
+            // Set cooldown
+            if (Mod.switchCooldownMode == Mod.SwitchCooldownMode.SingleCooldown)
+                timeSinceSwitchingSlots.SetValue(0f);
+            else if (Mod.switchCooldownMode == Mod.SwitchCooldownMode.ScrollCooldown)
+            {
+                Logging.Write($"distanceLeft: {distanceLeft}, distanceRight: {distanceRight}");
+                timeSinceSwitchingSlots.SetValue(-cooldownLength * Math.Max(Math.Min(Math.Abs(distanceLeft), Math.Abs(distanceRight)) - 1, 0));
+                Logging.Write($"cooldown: {timeSinceSwitchingSlots.GetValue<float>()}");
+            }
 
         } // end SwitchToSlot
 
