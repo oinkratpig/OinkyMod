@@ -45,9 +45,9 @@ namespace OinkyMod
 
         /// <summary>
         /// Flat amount of stamina regain to always recover when not sprinting.<br/>
-        /// 12f = not much faster (barely noticeable)<br/>
-        /// 9f = a bit faster (not too strong)<br/>
-        /// 6f = a lot faster (cheating)
+        /// 15f = barely faster (barely noticeable)<br/>
+        /// 12f = a bit faster (not too strong)<br/>
+        /// 9f = a lot faster (cheating)
         /// </summary>
         public static float BonusStaminaRegain { get; private set; }
 
@@ -60,7 +60,7 @@ namespace OinkyMod
         static ModConfig()
         {
             QuotaDays = 10;
-            BonusStaminaRegain = 9f;
+            BonusStaminaRegain = 12f;
             SwitchCooldownMode = SwitchCooldownModes.SingleCooldown;
             ModFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PluginInfo.PLUGIN_NAME);
 
