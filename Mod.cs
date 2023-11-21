@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using UnityEngine.Networking;
 using UnityEngine;
 using System.Collections.Generic;
-using static OinkyMod.Mod;
 
 namespace OinkyMod
 {

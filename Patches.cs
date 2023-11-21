@@ -1,13 +1,8 @@
-﻿using DunGen;
-using GameNetcodeStuff;
+﻿using GameNetcodeStuff;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.XR;
-using System.Windows.Input;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
-using UnityEngine.InputSystem.Controls;
 using System.Reflection;
 using System;
 
@@ -15,7 +10,6 @@ namespace OinkyMod
 {
     public static class Patches
     {
-        private static float _stamina;
         private static int _switchToSlot = -1;
         private static List<InputAction> _actions;
         private static PlayerControllerB _playerBeingControlled;
@@ -176,72 +170,6 @@ namespace OinkyMod
             }
 
         } // end SwitchToSlot
-
-        /// <summary>
-        /// Handle player input
-        /// </summary>
-        /// <param name="__instance"></param>
-        [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
-        [HarmonyPostfix]
-        public static void PlayerLateUpdate(PlayerControllerB __instance)
-        {
-            // Switch to new item slot
-            if(_switchToSlot != -1)
-            {
-                // Traverse isn't working for some reason?
-                MethodInfo info = __instance.GetType().GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
-                info.Invoke(__instance, new object[] { _switchToSlot, null});
-
-                _switchToSlot = -1;
-            }
-
-        } // end PlayerLateUpdate
-
-        /// <summary>
-        /// Switches items based on the number key press.
-        /// </summary>
-        [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
-        [HarmonyPostfix]
-        public static void PlayerNumKeySwitch(PlayerControllerB __instance)
-        {
-            /*
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-                Traverse.Create(__instance).Method("SwitchToItemSlot", 1, null).GetValue();
-            else if (Input.GetKeyDown(KeyCode.Alpha4))
-                Traverse.Create(__instance).Method("SwitchToItemSlot", 2, null).GetValue();
-            else if(Input.GetKeyDown(KeyCode.Alpha5))
-                Traverse.Create(__instance).Method("SwitchToItemSlot", 3, null).GetValue();
-            else if(Input.GetKeyDown(KeyCode.Alpha6))
-                Traverse.Create(__instance).Method("SwitchToItemSlot", 4, null).GetValue();
-            */
-
-        } // end PlayerNumKeySwitch
-
-        /*
-        [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
-        [HarmonyPrefix]
-        public static void StaminaPrefix(PlayerControllerB __instance)
-        {
-            _stamina = __instance.sprintMeter;
-
-        } // end StaminaPrefix
-        */
-
-        /*
-        [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
-        [HarmonyPostfix]
-        public static void StaminaPostfix(PlayerControllerB __instance)
-        {
-            if (__instance.sprintMeter > _stamina)
-            {
-                Logging.Write($"Higher: {_stamina}");
-                _stamina = Mathf.Clamp(_stamina + (__instance.sprintMeter - _stamina) * Mod.StaminaRegenMultiplier, 0f, 1f);
-                Logging.Write($"to {_stamina}");
-            }
-            else Logging.Write($"Lower: {_stamina}");
-
-        } // end StaminaPrefix
-        */
 
     } // end class Patches
 
