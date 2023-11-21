@@ -35,6 +35,17 @@ namespace OinkyMod
         {
             Traverse timeSinceSwitchingSlots = Traverse.Create(PlayerBeingControlled).Field("timeSinceSwitchingSlots");
 
+            // Prevent switching under certain conditions
+            // (yes, the dev actually has this many conditionals)
+            // (at least in dnSpy)
+            bool throwingObject = Traverse.Create(PlayerBeingControlled).Field("throwingObject").GetValue<bool>();
+            if(PlayerBeingControlled.inTerminalMenu || PlayerBeingControlled.jetpackControls || PlayerBeingControlled.disablingJetpackControls ||
+                ((!PlayerBeingControlled.IsOwner || !PlayerBeingControlled.isPlayerControlled || (PlayerBeingControlled.IsServer && !PlayerBeingControlled.isHostPlayerObject)) && !PlayerBeingControlled.isTestingPlayer) ||
+                PlayerBeingControlled.isGrabbingObjectAnimation || PlayerBeingControlled.inSpecialInteractAnimation || throwingObject || PlayerBeingControlled.isTypingChat || PlayerBeingControlled.twoHanded || PlayerBeingControlled.activatingItem)
+            {
+                return;
+            }
+
             // Wait cooldown
             float cooldownLength = 0.3f;
             if (ModConfig.SwitchCooldownMode != ModConfig.SwitchCooldownModes.NoCooldown &&
