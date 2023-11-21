@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using UnityEngine.InputSystem.Controls;
 using System.Reflection;
+using System;
 
 namespace OinkyMod
 {
@@ -17,6 +18,7 @@ namespace OinkyMod
         private static float _stamina;
         private static int _switchToSlot = -1;
         private static List<InputAction> _actions;
+        private static PlayerControllerB _playerBeingControlled;
 
         // Constructor
         static Patches()
@@ -64,6 +66,15 @@ namespace OinkyMod
 
         } // end IncreasedQuotaDays
 
+        [HarmonyPatch(typeof(PlayerControllerB), "Start")]
+        [HarmonyPostfix]
+        public static void PlayerStart(PlayerControllerB __instance)
+        {
+            if(__instance.IsOwner)
+                _playerBeingControlled = __instance;
+
+        } // end PlayerStart
+
         /// <summary>
         /// Increases stamina regeneration
         /// </summary>
@@ -101,10 +112,38 @@ namespace OinkyMod
         } // end PlayerDeregisterKeys
 
         // Bad way of doing it but I'm tired gimme a break D:
-        private static void SwitchToSlot1(InputAction.CallbackContext obj) { _switchToSlot = 0; }
-        private static void SwitchToSlot2(InputAction.CallbackContext obj) { _switchToSlot = 1; }
-        private static void SwitchToSlot3(InputAction.CallbackContext obj) { _switchToSlot = 2; }
-        private static void SwitchToSlot4(InputAction.CallbackContext obj) { _switchToSlot = 3; }
+        private static void SwitchToSlot1(InputAction.CallbackContext obj) { SwitchToSlot(0); }
+        private static void SwitchToSlot2(InputAction.CallbackContext obj) { SwitchToSlot(1); }
+        private static void SwitchToSlot3(InputAction.CallbackContext obj) { SwitchToSlot(2); }
+        private static void SwitchToSlot4(InputAction.CallbackContext obj) { SwitchToSlot(3); }
+
+        /// <summary>
+        /// Switch to a specific slot
+        /// </summary>
+        private static void SwitchToSlot(int slot)
+        {
+            Logging.Write("terst");
+
+            int currentSlot = _playerBeingControlled.currentItemSlot;
+            int distanceLeft = currentSlot - slot;
+            int distanceRight = slot + _playerBeingControlled.ItemSlots.Length - currentSlot;
+            bool forward = distanceRight <= distanceLeft;
+            MethodInfo switchToItemSlot = _playerBeingControlled.GetType().GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+            //MethodInfo nextItemSlot = _playerBeingControlled.GetType().GetMethod("NextItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo switchItemSlotsServerRpc = _playerBeingControlled.GetType().GetMethod("SwitchItemSlotsServerRpc", BindingFlags.NonPublic | BindingFlags.Instance);
+            while (_playerBeingControlled.currentItemSlot != slot)
+            {
+                int nextSlot = Traverse.Create(_playerBeingControlled).Method("NextItemSlot", new Type[] { typeof(bool) }).GetValue<int>(new object[] { forward });
+                switchToItemSlot.Invoke(_playerBeingControlled, new object[] { nextSlot, null });
+                switchItemSlotsServerRpc.Invoke(_playerBeingControlled, new object[] { forward });
+            }
+            if (_playerBeingControlled.currentlyHeldObjectServer != null)
+            {
+                _playerBeingControlled.currentlyHeldObjectServer.gameObject.GetComponent<AudioSource>().PlayOneShot(_playerBeingControlled.currentlyHeldObjectServer.itemProperties.grabSFX, 0.6f);
+            }
+            Traverse.Create(_playerBeingControlled).Field("timeSinceSwitchingSlots").SetValue(0f);
+
+        } // end SwitchToSlot
 
         /// <summary>
         /// Handle player input
