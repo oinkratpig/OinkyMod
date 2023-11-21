@@ -6,13 +6,44 @@ using UnityEngine.UIElements;
 using UnityEngine.XR;
 using System.Windows.Input;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using UnityEngine.InputSystem.Controls;
+using System.Reflection;
 
 namespace OinkyMod
 {
     public static class Patches
     {
         private static float _stamina;
+        private static int _switchToSlot = -1;
+        private static List<InputAction> _actions;
 
+        // Constructor
+        static Patches()
+        {
+            _actions = new List<InputAction>();
+            InputAction alpha1 = new InputAction();
+            alpha1.AddBinding("<Keyboard>/1");
+            alpha1.started += SwitchToSlot1;
+            _actions.Add(alpha1);
+            InputAction alpha2 = new InputAction();
+            alpha2.AddBinding("<Keyboard>/2");
+            alpha2.started += SwitchToSlot2;
+            _actions.Add(alpha2);
+            InputAction alpha3 = new InputAction();
+            alpha3.AddBinding("<Keyboard>/3");
+            alpha3.started += SwitchToSlot3;
+            _actions.Add(alpha3);
+            InputAction alpha4 = new InputAction();
+            alpha4.AddBinding("<Keyboard>/4");
+            alpha4.started += SwitchToSlot4;
+            _actions.Add(alpha4);
+
+        } // end constructor
+
+        /// <summary>
+        /// Adds custom audio for the boombox.
+        /// </summary>
         [HarmonyPatch(typeof(BoomboxItem), "Start")]
         [HarmonyPostfix]
         public static void BoomboxCustomAudio(BoomboxItem __instance)
@@ -22,6 +53,9 @@ namespace OinkyMod
 
         } // end BoomboxCustomAudio
 
+        /// <summary>
+        /// Increases quota day count.
+        /// </summary>
         [HarmonyPatch(typeof(TimeOfDay), "Awake")]
         [HarmonyPostfix]
         public static void IncreasedQuotaDays(TimeOfDay __instance)
@@ -30,6 +64,9 @@ namespace OinkyMod
 
         } // end IncreasedQuotaDays
 
+        /// <summary>
+        /// Increases stamina regeneration
+        /// </summary>
         [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
         [HarmonyPrefix]
         public static void FlatStaminaRegain(PlayerControllerB __instance)
@@ -39,22 +76,59 @@ namespace OinkyMod
 
         } // end FlatStaminaRegain
 
+        /// <summary>
+        /// Registers new keys for the player.
+        /// </summary>
         [HarmonyPatch(typeof(PlayerControllerB), "OnEnable")]
         [HarmonyPrefix]
         public static void PlayerRegisterKeys(PlayerControllerB __instance)
         {
-            InputAction action = new InputAction();
-            action.AddBinding("<Keyboard>/r");
-            action.performed += Test;
+            foreach (InputAction action in _actions)
+                action.Enable();
 
         } // end PlayerRegisterKeys
 
-        public static void Test(InputAction.CallbackContext context)
+        /// <summary>
+        /// Deregisters new keys for the player.
+        /// </summary>
+        [HarmonyPatch(typeof(PlayerControllerB), "OnDisable")]
+        [HarmonyPrefix]
+        public static void PlayerDeregisterKeys(PlayerControllerB __instance)
         {
-            Logging.Write("test!!!!!");
+            foreach (InputAction action in _actions)
+                action.Disable();
 
-        } // end Test
+        } // end PlayerDeregisterKeys
 
+        // Bad way of doing it but I'm tired gimme a break D:
+        private static void SwitchToSlot1(InputAction.CallbackContext obj) { _switchToSlot = 0; }
+        private static void SwitchToSlot2(InputAction.CallbackContext obj) { _switchToSlot = 1; }
+        private static void SwitchToSlot3(InputAction.CallbackContext obj) { _switchToSlot = 2; }
+        private static void SwitchToSlot4(InputAction.CallbackContext obj) { _switchToSlot = 3; }
+
+        /// <summary>
+        /// Handle player input
+        /// </summary>
+        /// <param name="__instance"></param>
+        [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
+        [HarmonyPostfix]
+        public static void PlayerLateUpdate(PlayerControllerB __instance)
+        {
+            // Switch to new item slot
+            if(_switchToSlot != -1)
+            {
+                // Traverse isn't working for some reason?
+                MethodInfo info = __instance.GetType().GetMethod("SwitchToItemSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+                info.Invoke(__instance, new object[] { _switchToSlot, null});
+
+                _switchToSlot = -1;
+            }
+
+        } // end PlayerLateUpdate
+
+        /// <summary>
+        /// Switches items based on the number key press.
+        /// </summary>
         [HarmonyPatch(typeof(PlayerControllerB), "LateUpdate")]
         [HarmonyPostfix]
         public static void PlayerNumKeySwitch(PlayerControllerB __instance)
