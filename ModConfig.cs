@@ -59,7 +59,7 @@ namespace OinkyMod
         // Constructor
         static ModConfig()
         {
-            QuotaDays = 4;
+            QuotaDays = 10;
             BonusStaminaRegain = 9f;
             SwitchCooldownMode = SwitchCooldownModes.SingleCooldown;
             ModFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PluginInfo.PLUGIN_NAME);
