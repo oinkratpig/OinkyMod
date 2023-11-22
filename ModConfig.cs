@@ -57,6 +57,11 @@ namespace OinkyMod
         public static bool InvertMousewheel { get; private set; }
 
         /// <summary>
+        /// Whether changes that provide advantages will be enabled.
+        /// </summary>
+        public static bool CheatsEnabled { get; private set; }
+
+        /// <summary>
         /// Cooldown mode for switching items using number keys.
         /// </summary>
         public static SwitchCooldownModes SwitchCooldownMode;
@@ -66,10 +71,12 @@ namespace OinkyMod
         {
             ModFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PluginInfo.PLUGIN_NAME);
 
-            QuotaDays = 10;
-            BonusStaminaRegain = 15f;
             SwitchCooldownMode = SwitchCooldownModes.SingleCooldown;
             InvertMousewheel = true;
+
+            CheatsEnabled = false;
+            QuotaDays = 4;
+            BonusStaminaRegain = 0f;
 
         } // end constructor
 

@@ -29,7 +29,8 @@ namespace OinkyMod
         [HarmonyPostfix]
         public static void IncreasedQuotaDays(TimeOfDay __instance)
         {
-            __instance.quotaVariables.deadlineDaysAmount = ModConfig.QuotaDays;
+            if(ModConfig.CheatsEnabled)
+                __instance.quotaVariables.deadlineDaysAmount = ModConfig.QuotaDays;
 
         } // end IncreasedQuotaDays
 
@@ -40,7 +41,7 @@ namespace OinkyMod
         [HarmonyPrefix]
         public static void FlatStaminaRegain(PlayerControllerB __instance)
         {
-            if(!__instance.isSprinting)
+            if(ModConfig.CheatsEnabled && !__instance.isSprinting)
                 __instance.sprintMeter = Mathf.Clamp(__instance.sprintMeter + Time.deltaTime / ModConfig.BonusStaminaRegain, 0f, 1f);
 
         } // end FlatStaminaRegain
