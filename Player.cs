@@ -17,6 +17,7 @@ namespace OinkyMod
         {
             CustomKeys.SwitchToSlot = SwitchToSlot;
             CustomKeys.InvertedMousewheelSwitch = InvertedMousewheelSwitch;
+            CustomKeys.Emote = Emote;
 
         } // end Player
 
@@ -41,6 +42,25 @@ namespace OinkyMod
             SwitchToSlot(nextItemSlot.GetValue<int>(!forward));
 
         } // end InvertedMousewheelSwitch
+
+        /// <summary>
+        /// Perform an emote.
+        /// </summary>
+        private static void Emote(int emoteID)
+        {
+            if ((!PlayerBeingControlled.IsOwner || !PlayerBeingControlled.isPlayerControlled || (PlayerBeingControlled.IsServer && !PlayerBeingControlled.isHostPlayerObject)) && !PlayerBeingControlled.isTestingPlayer)
+                return;
+            if (!Traverse.Create(PlayerBeingControlled).Method("CheckConditionsForEmote").GetValue<bool>())
+                return;
+            if (PlayerBeingControlled.timeSinceStartingEmote < 0.5f)
+                return;
+
+            PlayerBeingControlled.timeSinceStartingEmote = 0f;
+            PlayerBeingControlled.performingEmote = true;
+            PlayerBeingControlled.playerBodyAnimator.SetInteger("emoteNumber", emoteID);
+            PlayerBeingControlled.StartPerformingEmoteServerRpc();
+
+        } // end Emote
 
         /// <summary>
         /// Switch to a specific slot

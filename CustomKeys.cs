@@ -10,17 +10,13 @@ namespace OinkyMod
     public static class CustomKeys
     {
         
-        /// <summary>
-        /// Callback for switching slots with number keys.
-        /// </summary>
+        // Callbacks for pressing keys
         public static SwitchToSlotCallback SwitchToSlot { get; set; }
         public delegate void SwitchToSlotCallback(int slot);
-
-        /// <summary>
-        /// Callback for switching slots with mousewheel (inverted).
-        /// </summary>
         public static InvertedMousewheelSwitchCallback InvertedMousewheelSwitch { get; set; }
         public delegate void InvertedMousewheelSwitchCallback(bool forward);
+        public static EmoteCallback Emote { get; set; }
+        public delegate void EmoteCallback(int emoteID);
 
         private static List<InputAction> _actions;
 
@@ -53,8 +49,18 @@ namespace OinkyMod
             alpha4.started += SwitchToSlot4;
             _actions.Add(alpha4);
 
+            // Emotes
+            InputAction emote1 = new InputAction();
+            emote1.AddBinding("<Keyboard>/g");
+            emote1.started += Emote1;
+            _actions.Add(emote1);
+            InputAction emote2 = new InputAction();
+            emote2.AddBinding("<Keyboard>/r");
+            emote2.started += Emote2;
+            _actions.Add(emote2);
+
             // Invert mousewheel
-            if(ModConfig.InvertMousewheel)
+            if (ModConfig.InvertMousewheel)
             {
                 InputAction switchItem = new InputAction();
                 switchItem.AddBinding("<Mouse>/scroll/y");
@@ -99,6 +105,10 @@ namespace OinkyMod
         private static void SwitchToSlot2(InputAction.CallbackContext context) { SwitchToSlot(1); }
         private static void SwitchToSlot3(InputAction.CallbackContext context) { SwitchToSlot(2); }
         private static void SwitchToSlot4(InputAction.CallbackContext context) { SwitchToSlot(3); }
+
+        // Emotes
+        private static void Emote1(InputAction.CallbackContext context) { Emote(1); }
+        private static void Emote2(InputAction.CallbackContext context) { Emote(2); }
 
         // Inverted mousewheel switch
         private static void SwitchMousewheelInverted(InputAction.CallbackContext context)

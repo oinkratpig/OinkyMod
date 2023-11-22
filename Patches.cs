@@ -50,13 +50,28 @@ namespace OinkyMod
         /// </summary>
         [HarmonyPatch(typeof(PlayerControllerB), "SwitchItem_performed")]
         [HarmonyPrefix]
-        public static bool DisableNormalScrollWheel(PlayerControllerB __instance)
+        public static bool DisableNormalScrollWheel()
         {
             if(ModConfig.InvertMousewheel)
                 return false;
             return true;
 
         } // end DisableNormalScrollWheel
+
+        /// <summary>
+        /// Disable default key for emoting.
+        /// </summary>
+        [HarmonyPatch(typeof(PlayerControllerB), "Emote1_performed")]
+        [HarmonyPrefix]
+        public static bool DisableEmote1() { return false; }
+
+        /// <summary>
+        /// Disable default key for emoting.
+        /// </summary>
+        [HarmonyPatch(typeof(PlayerControllerB), "Emote2_performed")]
+        [HarmonyPrefix]
+        public static bool DisableEmote2() { return false; }
+
 
     } // end class Patches
 
