@@ -51,11 +51,11 @@ namespace OinkyMod
 
             // Emotes
             InputAction emote1 = new InputAction();
-            emote1.AddBinding("<Keyboard>/g");
+            emote1.AddBinding("<Keyboard>/z");
             emote1.started += Emote1;
             _actions.Add(emote1);
             InputAction emote2 = new InputAction();
-            emote2.AddBinding("<Keyboard>/r");
+            emote2.AddBinding("<Keyboard>/q");
             emote2.started += Emote2;
             _actions.Add(emote2);
 
