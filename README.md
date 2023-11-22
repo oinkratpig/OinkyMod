@@ -6,5 +6,5 @@ Lethal company mod for random stuffs
 - Invert inventory scrolling direction
 
 Cheats
-- Modify quota day length
+- Modify quota deadline
 - Stamina regeneration increase
