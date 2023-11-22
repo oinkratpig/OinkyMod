@@ -45,6 +45,19 @@ namespace OinkyMod
 
         } // end FlatStaminaRegain
 
+        /// <summary>
+        /// Disable normal scrollwheel scrolling if inverted.
+        /// </summary>
+        [HarmonyPatch(typeof(PlayerControllerB), "SwitchItem_performed")]
+        [HarmonyPrefix]
+        public static bool DisableNormalScrollWheel(PlayerControllerB __instance)
+        {
+            if(ModConfig.InvertMousewheel)
+                return false;
+            return true;
+
+        } // end DisableNormalScrollWheel
+
     } // end class Patches
 
 } // end namespace

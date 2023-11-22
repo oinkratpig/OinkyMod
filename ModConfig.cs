@@ -45,11 +45,16 @@ namespace OinkyMod
 
         /// <summary>
         /// Flat amount of stamina regain to always recover when not sprinting.<br/>
-        /// 15f = barely faster (barely noticeable)<br/>
-        /// 12f = a bit faster (not too strong)<br/>
-        /// 9f = a lot faster (cheating)
+        /// 20f = only noticeable when heavy<br/>
+        /// 15f = a bit faster (balanced)<br/>
+        /// 10f = a lot faster (cheating)
         /// </summary>
         public static float BonusStaminaRegain { get; private set; }
+
+        /// <summary>
+        /// Invert mousewheel item switching direction
+        /// </summary>
+        public static bool InvertMousewheel { get; private set; }
 
         /// <summary>
         /// Cooldown mode for switching items using number keys.
@@ -59,10 +64,12 @@ namespace OinkyMod
         // Constructor
         static ModConfig()
         {
-            QuotaDays = 10;
-            BonusStaminaRegain = 12f;
-            SwitchCooldownMode = SwitchCooldownModes.SingleCooldown;
             ModFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), PluginInfo.PLUGIN_NAME);
+
+            QuotaDays = 10;
+            BonusStaminaRegain = 15f;
+            SwitchCooldownMode = SwitchCooldownModes.SingleCooldown;
+            InvertMousewheel = true;
 
         } // end constructor
 

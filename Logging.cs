@@ -8,7 +8,7 @@ namespace OinkyMod
         public static ManualLogSource Logger { get; set; }
 
         private static string _logPath;
-        private const string LOG_FILE_NAME = "log.txt";
+        private const string LOG_FILE_NAME = "oinkymod.log";
 
         // Constructor
         static Logging()

@@ -16,6 +16,7 @@ namespace OinkyMod
         static Player()
         {
             CustomKeys.SwitchToSlot = SwitchToSlot;
+            CustomKeys.InvertedMousewheelSwitch = InvertedMousewheelSwitch;
 
         } // end Player
 
@@ -27,6 +28,19 @@ namespace OinkyMod
                 PlayerBeingControlled = __instance;
 
         } // end PlayerStart
+
+        /// <summary>
+        /// Inverted mousewheel item switch.
+        /// </summary>
+        /// <param name="forward"></param>
+        private static void InvertedMousewheelSwitch(bool forward)
+        {
+            // Unless I'm missing something, you can't just invert the SwitchItem_performed output
+            // without rewriting the method.
+            Traverse nextItemSlot = Traverse.Create(PlayerBeingControlled).Method("NextItemSlot", new Type[] { typeof(bool) });
+            SwitchToSlot(nextItemSlot.GetValue<int>(!forward));
+
+        } // end InvertedMousewheelSwitch
 
         /// <summary>
         /// Switch to a specific slot

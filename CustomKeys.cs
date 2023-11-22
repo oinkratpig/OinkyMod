@@ -16,13 +16,26 @@ namespace OinkyMod
         public static SwitchToSlotCallback SwitchToSlot { get; set; }
         public delegate void SwitchToSlotCallback(int slot);
 
+        /// <summary>
+        /// Callback for switching slots with mousewheel (inverted).
+        /// </summary>
+        public static InvertedMousewheelSwitchCallback InvertedMousewheelSwitch { get; set; }
+        public delegate void InvertedMousewheelSwitchCallback(bool forward);
+
         private static List<InputAction> _actions;
 
         // Constructor
         static CustomKeys()
         {
-            // Number keys
             _actions = new List<InputAction>();
+
+            // Debug
+            InputAction debug = new InputAction();
+            debug.AddBinding("<Keyboard>/0");
+            debug.started += Debug;
+            _actions.Add(debug);
+
+            // Number keys
             InputAction alpha1 = new InputAction();
             alpha1.AddBinding("<Keyboard>/1");
             alpha1.started += SwitchToSlot1;
@@ -39,6 +52,15 @@ namespace OinkyMod
             alpha4.AddBinding("<Keyboard>/4");
             alpha4.started += SwitchToSlot4;
             _actions.Add(alpha4);
+
+            // Invert mousewheel
+            if(ModConfig.InvertMousewheel)
+            {
+                InputAction switchItem = new InputAction();
+                switchItem.AddBinding("<Mouse>/scroll/y");
+                switchItem.performed += SwitchMousewheelInverted;
+                _actions.Add(switchItem);
+            }
 
         } // end CustomKeys
 
@@ -68,11 +90,22 @@ namespace OinkyMod
 
         } // end PlayerDeregisterKeys
 
-        // Bad way of doing it but I'm tired gimme a break D:
-        private static void SwitchToSlot1(InputAction.CallbackContext obj) { SwitchToSlot(0); }
-        private static void SwitchToSlot2(InputAction.CallbackContext obj) { SwitchToSlot(1); }
-        private static void SwitchToSlot3(InputAction.CallbackContext obj) { SwitchToSlot(2); }
-        private static void SwitchToSlot4(InputAction.CallbackContext obj) { SwitchToSlot(3); }
+        // Debug key
+        // Add things in body for debug - key is '0'
+        private static void Debug(InputAction.CallbackContext context) { }
+
+        // Switch slots with number keys
+        private static void SwitchToSlot1(InputAction.CallbackContext context) { SwitchToSlot(0); }
+        private static void SwitchToSlot2(InputAction.CallbackContext context) { SwitchToSlot(1); }
+        private static void SwitchToSlot3(InputAction.CallbackContext context) { SwitchToSlot(2); }
+        private static void SwitchToSlot4(InputAction.CallbackContext context) { SwitchToSlot(3); }
+
+        // Inverted mousewheel switch
+        private static void SwitchMousewheelInverted(InputAction.CallbackContext context)
+        {
+            InvertedMousewheelSwitch(context.ReadValue<float>() > 0f);
+
+        } // end SwitchMousewheelInverted
 
     } // end class CustomKeys
 
