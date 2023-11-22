@@ -13,4 +13,4 @@ Cheats
 
 1. Install BepInEx (https://docs.bepinex.dev/articles/user_guide/installation/index.html)
 2. Download OinkyMod (https://github.com/oinkratpig/OinkyMod/releases)
-3. Place FilterRemover.dll into game directory /BepInEx/plugins/
+3. Place OinkyMod.dll into game directory /BepInEx/plugins/
